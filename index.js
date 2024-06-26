@@ -11,31 +11,27 @@ const jwt = new JWT({
 });
 
 const doc = new GoogleSpreadsheet(credentials.sheetURL, jwt);
-
+async function addData(status, code) {
+  await doc.sheetsByIndex[0].addRow({
+    URL: "https://www.nmmc.gov.in/navimumbai/",
+    "Status Code": code,
+    Status: `Website is ${status}`,
+    Date: new Date().toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" }),
+    Time: new Date().toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" }),
+  });
+}
 async function ping() {
   await doc.loadInfo();
   try {
     let request = await fetch("https://www.nmmc.gov.in/navimumbai/");
     if (logged === false) {
-      await doc.sheetsByIndex[0].addRow({
-        URL: "https://www.nmmc.gov.in/navimumbai/",
-        "Status Code": request.status,
-        Status: "Website is up",
-        Date: new Date().toLocaleDateString(),
-        Time: new Date().toLocaleTimeString(),
-      });
+      await addData("up", request.status);
       logged = true;
       initiallydown = false;
     }
   } catch (error) {
     if (logged === true || initiallydown === true) {
-      await doc.sheetsByIndex[0].addRow({
-        URL: "https://www.nmmc.gov.in/navimumbai/",
-        "Status Code": 0,
-        Status: "Website is down",
-        Date: new Date().toLocaleDateString(),
-        Time: new Date().toLocaleTimeString(),
-      });
+      await addData("down", "000");
       logged = false;
       initiallydown = false;
     }
