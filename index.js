@@ -2,6 +2,7 @@ import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 import credentials from "./credentials.json" assert { type: "json" };
 let logged = false;
+let initiallydown = true;
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const jwt = new JWT({
   email: credentials.client_email,
@@ -24,9 +25,10 @@ async function ping() {
         Time: new Date().toLocaleTimeString(),
       });
       logged = true;
+      initiallydown = false;
     }
   } catch (error) {
-    if (logged === true) {
+    if (logged === true || initiallydown === true) {
       await doc.sheetsByIndex[0].addRow({
         URL: "https://www.nmmc.gov.in/navimumbai/",
         "Status Code": 0,
@@ -35,10 +37,8 @@ async function ping() {
         Time: new Date().toLocaleTimeString(),
       });
       logged = false;
+      initiallydown = false;
     }
   }
 }
 setInterval(ping, 30000);
-setInterval(() => {
-  logged = false;
-}, 86400000);
