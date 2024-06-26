@@ -14,10 +14,10 @@ const doc = new GoogleSpreadsheet(credentials.sheetURL, jwt);
 async function ping() {
   await doc.loadInfo();
   try {
+    let request = await fetch("https://www.nmmc.gov.in/navimumbai/");
     if (logged === false) {
-      let request = await fetch("https://www.nmmc.gov.in/navimumbai/");
       await doc.sheetsByIndex[0].addRow({
-        URL: "https://www.nmmc.gov.in/navimumbai",
+        URL: "https://www.nmmc.gov.in/navimumbai/",
         "Status Code": request.status,
         Status: "Website is up",
         Date: new Date().toLocaleDateString(),
@@ -26,15 +26,16 @@ async function ping() {
       logged = true;
     }
   } catch (error) {
-    if (logged === true)
+    if (logged === true) {
       await doc.sheetsByIndex[0].addRow({
-        URL: "https://www.nmmc.gov.in/navimumbai",
+        URL: "https://www.nmmc.gov.in/navimumbai/",
         "Status Code": 0,
         Status: "Website is down",
         Date: new Date().toLocaleDateString(),
         Time: new Date().toLocaleTimeString(),
       });
-    logged = false;
+      logged = false;
+    }
   }
 }
 setInterval(ping, 30000);
